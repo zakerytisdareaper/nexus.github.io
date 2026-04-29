@@ -1,19 +1,21 @@
-import { Zap } from "lucide-react";
+import { Zap, Sparkles, MessageCircle } from "lucide-react";
 
 interface Props {
   active: string;
   onChange: (id: string) => void;
+  aiOpen: boolean;
+  chatOpen: boolean;
+  onToggleAI: () => void;
+  onToggleChat: () => void;
 }
 
 const tabs = [
   { id: "home", label: "Home" },
-  { id: "proxy", label: "Proxy" },
+  { id: "browser", label: "Browser" },
   { id: "games", label: "Games" },
-  { id: "ai", label: "AI" },
-  { id: "chat", label: "Chat" },
 ];
 
-export const NexusHeader = ({ active, onChange }: Props) => (
+export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, onToggleChat }: Props) => (
   <header className="sticky top-0 z-50 glass">
     <div className="container flex h-16 items-center justify-between">
       <button onClick={() => onChange("home")} className="flex items-center gap-2 group">
@@ -27,7 +29,7 @@ export const NexusHeader = ({ active, onChange }: Props) => (
           NEXUS<span className="text-gradient">PROXY</span>
         </span>
       </button>
-      <nav className="hidden md:flex items-center gap-1">
+      <nav className="hidden sm:flex items-center gap-1">
         {tabs.map(t => (
           <button
             key={t.id}
@@ -42,13 +44,25 @@ export const NexusHeader = ({ active, onChange }: Props) => (
           </button>
         ))}
       </nav>
-      <select
-        value={active}
-        onChange={(e) => onChange(e.target.value)}
-        className="md:hidden bg-muted text-foreground rounded-lg px-3 py-2 text-sm border border-border"
-      >
-        {tabs.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
-      </select>
+      <div className="flex items-center gap-1">
+        <select
+          value={active}
+          onChange={(e) => onChange(e.target.value)}
+          className="sm:hidden bg-muted text-foreground rounded-lg px-2 py-1.5 text-sm border border-border mr-1"
+        >
+          {tabs.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+        </select>
+        <button
+          onClick={onToggleAI}
+          title="Nexus AI"
+          className={`p-2 rounded-lg transition-smooth ${aiOpen ? "bg-gradient-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+        ><Sparkles className="h-4 w-4" /></button>
+        <button
+          onClick={onToggleChat}
+          title="Live Chat"
+          className={`p-2 rounded-lg transition-smooth ${chatOpen ? "bg-gradient-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+        ><MessageCircle className="h-4 w-4" /></button>
+      </div>
     </div>
   </header>
 );
