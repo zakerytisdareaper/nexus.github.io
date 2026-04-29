@@ -1,0 +1,2 @@
+ALTER TABLE public.chat_messages REPLICA IDENTITY FULL;
+ALTER TABLE public.announcements REPLICA IDENTITY FULL;

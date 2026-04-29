@@ -7,6 +7,8 @@ interface AuthState {
   session: Session | null;
   username: string | null;
   loading: boolean;
+  isAdmin: boolean;
+  refreshAdmin: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -17,6 +19,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const checkAdmin = async (uid: string) => {
+    const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid).eq("role", "admin").maybeSingle();
+    setIsAdmin(!!data);
+  };
+
+  const refreshAdmin = async () => {
+    if (user) await checkAdmin(user.id);
+  };
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
@@ -26,9 +38,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setTimeout(() => {
           supabase.from("profiles").select("username").eq("user_id", s.user.id).maybeSingle()
             .then(({ data }) => setUsername(data?.username ?? s.user.email?.split("@")[0] ?? null));
+          checkAdmin(s.user.id);
         }, 0);
       } else {
         setUsername(null);
+        setIsAdmin(false);
       }
     });
 
@@ -38,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (s?.user) {
         supabase.from("profiles").select("username").eq("user_id", s.user.id).maybeSingle()
           .then(({ data }) => setUsername(data?.username ?? s.user.email?.split("@")[0] ?? null));
+        checkAdmin(s.user.id);
       }
       setLoading(false);
     });
@@ -48,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => { await supabase.auth.signOut(); };
 
   return (
-    <Ctx.Provider value={{ user, session, username, loading, signOut }}>
+    <Ctx.Provider value={{ user, session, username, loading, isAdmin, refreshAdmin, signOut }}>
       {children}
     </Ctx.Provider>
   );

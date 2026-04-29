@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, X, ArrowLeft, ArrowRight, RotateCw, Lock, Home, ExternalLink, Globe } from "lucide-react";
 
 type Tab = { id: string; title: string; url: string | null; input: string; key: number };
@@ -16,17 +16,54 @@ const QUICK = [
 
 const newTab = (): Tab => ({ id: crypto.randomUUID(), title: "New Tab", url: null, input: "", key: 0 });
 
+const NEXUS_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/proxy?url=`;
+const STORAGE_KEY = "nexus.browser.tabs.v1";
+
 const normalize = (raw: string): string => {
   const t = raw.trim();
   if (!t) return "";
   if (/^https?:\/\//i.test(t)) return t;
   if (t.includes(".") && !t.includes(" ")) return `https://${t}`;
-  return `https://duckduckgo.com/?q=${encodeURIComponent(t)}`;
+  return `https://www.google.com/search?igu=1&q=${encodeURIComponent(t)}`;
 };
 
 export const BrowserView = () => {
-  const [tabs, setTabs] = useState<Tab[]>([newTab()]);
-  const [activeId, setActiveId] = useState(tabs[0].id);
+  const [tabs, setTabs] = useState<Tab[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.tabs) && parsed.tabs.length) return parsed.tabs;
+      }
+    } catch {}
+    return [newTab()];
+  });
+  const [activeId, setActiveId] = useState<string>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.activeId) return parsed.activeId;
+      }
+    } catch {}
+    return "";
+  });
+  const [useProxy, setUseProxy] = useState<boolean>(() => {
+    return localStorage.getItem("nexus.browser.useProxy") !== "false";
+  });
+
+  useEffect(() => {
+    if (!tabs.find(t => t.id === activeId)) setActiveId(tabs[0]?.id ?? "");
+  }, [tabs, activeId]);
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ tabs, activeId })); } catch {}
+  }, [tabs, activeId]);
+
+  useEffect(() => {
+    localStorage.setItem("nexus.browser.useProxy", String(useProxy));
+  }, [useProxy]);
+
   const active = tabs.find(t => t.id === activeId)!;
 
   const update = (id: string, patch: Partial<Tab>) =>
@@ -124,6 +161,13 @@ export const BrowserView = () => {
             title="Open in new tab"
           ><ExternalLink className="h-4 w-4" /></a>
         )}
+        <button
+          onClick={() => setUseProxy(p => !p)}
+          title={useProxy ? "Proxy ON — bypassing blocks" : "Proxy OFF — direct"}
+          className={`px-2 py-1 rounded-md text-[10px] font-bold transition-smooth ${
+            useProxy ? "bg-gradient-primary text-primary-foreground shadow-glow" : "bg-muted text-muted-foreground"
+          }`}
+        >{useProxy ? "PROXY" : "DIRECT"}</button>
       </div>
 
       {/* Content */}
@@ -131,7 +175,7 @@ export const BrowserView = () => {
         {active.url ? (
           <iframe
             key={`${active.id}-${active.key}`}
-            src={active.url}
+            src={useProxy ? `${NEXUS_PROXY}${encodeURIComponent(active.url)}` : active.url}
             title={active.title}
             sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-presentation allow-pointer-lock"
             className="w-full h-full bg-white border-0"

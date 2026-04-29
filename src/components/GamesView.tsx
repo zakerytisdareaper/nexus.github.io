@@ -39,19 +39,19 @@ const faviconFor = (url: string) => {
   } catch { return ""; }
 };
 
-// Simple proxy frontends — flips traffic through a third-party so blocked
-// origins can be reached. For full bypass you'd want Ultraviolet/Rammerhead.
+// Server-side proxy strips X-Frame-Options/CSP so blocked sites embed cleanly.
+const NEXUS_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/proxy?url=`;
 const PROXIES = [
+  { id: "nexus", name: "Nexus (recommended)", wrap: (u: string) => `${NEXUS_PROXY}${encodeURIComponent(u)}` },
   { id: "direct", name: "Direct", wrap: (u: string) => u },
   { id: "croxy", name: "CroxyProxy", wrap: (u: string) => `https://www.croxyproxy.com/_public/api/url?u=${encodeURIComponent(u)}` },
-  { id: "weeb", name: "WeeProxy", wrap: (u: string) => `https://www.weeproxy.com/?u=${encodeURIComponent(u)}` },
 ] as const;
 type ProxyId = typeof PROXIES[number]["id"];
 
 export const GamesView = () => {
   const [active, setActive] = useState<Game | null>(null);
   const [filter, setFilter] = useState("All");
-  const [proxy, setProxy] = useState<ProxyId>("direct");
+  const [proxy, setProxy] = useState<ProxyId>("nexus");
   const list = filter === "All" ? GAMES : GAMES.filter(g => g.tag === filter);
   const wrap = PROXIES.find(p => p.id === proxy)!.wrap;
 
