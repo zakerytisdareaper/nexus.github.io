@@ -1,4 +1,4 @@
-import { Zap, Sparkles, MessageCircle, Settings } from "lucide-react";
+import { Zap, Sparkles, MessageCircle, Settings, LogOut } from "lucide-react";
 
 interface Props {
   active: string;
@@ -7,6 +7,8 @@ interface Props {
   chatOpen: boolean;
   onToggleAI: () => void;
   onToggleChat: () => void;
+  onSignOut?: () => void;
+  username?: string | null;
 }
 
 const tabs = [
@@ -16,7 +18,7 @@ const tabs = [
   { id: "settings", label: "Settings" },
 ];
 
-export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, onToggleChat }: Props) => (
+export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, onToggleChat, onSignOut, username }: Props) => (
   <header className="sticky top-0 z-50 glass">
     <div className="container flex h-16 items-center justify-between">
       <button onClick={() => onChange("home")} className="flex items-center gap-2 group">
@@ -27,7 +29,7 @@ export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, on
           </div>
         </div>
         <span className="font-display text-xl font-bold tracking-tight">
-          NEXUS<span className="text-gradient">PROXY</span>
+          NƎXUS<span className="text-gradient"> · PRØXY</span>
         </span>
       </button>
       <nav className="hidden sm:flex items-center gap-1">
@@ -68,6 +70,18 @@ export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, on
           title="Settings"
           className={`p-2 rounded-lg transition-smooth sm:hidden ${active === "settings" ? "bg-gradient-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
         ><Settings className="h-4 w-4" /></button>
+        {username && (
+          <span className="hidden md:inline text-xs text-muted-foreground px-2 truncate max-w-[120px]" title={username}>
+            {username}
+          </span>
+        )}
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            title="Sign out"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-smooth"
+          ><LogOut className="h-4 w-4" /></button>
+        )}
       </div>
     </div>
   </header>

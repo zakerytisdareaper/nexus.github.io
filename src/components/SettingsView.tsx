@@ -110,7 +110,7 @@ export const SettingsView = () => {
             onClick={openCloak}
             className="bg-gradient-primary text-primary-foreground font-semibold px-5 py-2.5 rounded-lg shadow-glow hover:scale-105 transition-smooth"
           >
-            Open cloaked tab
+            Open in about:blank
           </button>
         )}
       </section>
