@@ -3,10 +3,10 @@ import { Globe, Gamepad2, Sparkles, MessageCircle, Shield, Zap } from "lucide-re
 interface Props { onNavigate: (id: string) => void; }
 
 const features = [
-  { id: "proxy", icon: Globe, title: "Web Proxy", desc: "Open any site through our cloaked browser. Bypass filters instantly.", color: "shadow-blue" },
+  { id: "browser", icon: Globe, title: "Web Browser", desc: "Tabbed proxy browser. Open any site, bypass filters instantly.", color: "shadow-blue" },
   { id: "games", icon: Gamepad2, title: "20+ Games", desc: "Curated unblocked classics. One click to play, zero install.", color: "shadow-purple" },
-  { id: "ai", icon: Sparkles, title: "Nexus AI", desc: "A custom-built assistant for homework, code, and ideas.", color: "shadow-glow" },
-  { id: "chat", icon: MessageCircle, title: "Live Chat", desc: "Talk to other Nexus users in realtime. No login required.", color: "shadow-blue" },
+  { id: "ai", icon: Sparkles, title: "Nexus AI", desc: "Side panel assistant — chat while you browse.", color: "shadow-glow" },
+  { id: "chat", icon: MessageCircle, title: "Live Chat", desc: "Side panel lobby — talk while you browse or play.", color: "shadow-blue" },
 ];
 
 export const HomeView = ({ onNavigate }: Props) => (
@@ -25,10 +25,10 @@ export const HomeView = ({ onNavigate }: Props) => (
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <button
-          onClick={() => onNavigate("proxy")}
+          onClick={() => onNavigate("browser")}
           className="bg-gradient-primary text-primary-foreground font-semibold px-7 py-3.5 rounded-xl shadow-glow hover:scale-105 transition-smooth flex items-center gap-2"
         >
-          <Zap className="h-4 w-4" /> Launch Proxy
+          <Zap className="h-4 w-4" /> Launch Browser
         </button>
         <button
           onClick={() => onNavigate("games")}
