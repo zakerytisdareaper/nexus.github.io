@@ -1,4 +1,4 @@
-import { Zap, Sparkles, MessageCircle } from "lucide-react";
+import { Zap, Sparkles, MessageCircle, Settings } from "lucide-react";
 
 interface Props {
   active: string;
@@ -13,6 +13,7 @@ const tabs = [
   { id: "home", label: "Home" },
   { id: "browser", label: "Browser" },
   { id: "games", label: "Games" },
+  { id: "settings", label: "Settings" },
 ];
 
 export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, onToggleChat }: Props) => (
@@ -62,6 +63,11 @@ export const NexusHeader = ({ active, onChange, aiOpen, chatOpen, onToggleAI, on
           title="Live Chat"
           className={`p-2 rounded-lg transition-smooth ${chatOpen ? "bg-gradient-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
         ><MessageCircle className="h-4 w-4" /></button>
+        <button
+          onClick={() => onChange("settings")}
+          title="Settings"
+          className={`p-2 rounded-lg transition-smooth sm:hidden ${active === "settings" ? "bg-gradient-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+        ><Settings className="h-4 w-4" /></button>
       </div>
     </div>
   </header>

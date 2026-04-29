@@ -7,6 +7,9 @@ import { GamesView } from "@/components/GamesView";
 import { AIView } from "@/components/AIView";
 import { ChatView } from "@/components/ChatView";
 import { SidePanel } from "@/components/SidePanel";
+import { SettingsView } from "@/components/SettingsView";
+import { DotsBackground } from "@/components/DotsBackground";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 
 const Index = () => {
   const [tab, setTab] = useState("home");
@@ -23,7 +26,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <SettingsProvider>
+    <div className="min-h-screen flex flex-col relative">
+      <DotsBackground />
+      <div className="relative z-10 flex flex-col min-h-screen">
       <NexusHeader
         active={tab}
         onChange={setTab}
@@ -36,6 +42,7 @@ const Index = () => {
         {tab === "home" && <HomeView onNavigate={handleNav} />}
         {tab === "browser" && <BrowserView />}
         {tab === "games" && <GamesView />}
+        {tab === "settings" && <SettingsView />}
       </main>
 
       <SidePanel
@@ -55,7 +62,9 @@ const Index = () => {
       >
         <ChatView />
       </SidePanel>
+      </div>
     </div>
+    </SettingsProvider>
   );
 };
 
