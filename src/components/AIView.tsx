@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Send, User, Bot, Loader2 } from "lucide-react";
+import { Send, User, Bot, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -76,55 +76,40 @@ export const AIView = () => {
   };
 
   return (
-    <div className="container py-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-4">
-            <Sparkles className="h-3.5 w-3.5 text-accent" />
-            <span className="text-xs font-medium uppercase tracking-wider">Custom AI</span>
+    <div className="flex flex-col h-full">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex gap-2 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
+            <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${m.role === "user" ? "bg-secondary" : "bg-gradient-primary"}`}>
+              {m.role === "user" ? <User className="h-3.5 w-3.5 text-secondary-foreground" /> : <Bot className="h-3.5 w-3.5 text-primary-foreground" />}
+            </div>
+            <div className={`px-3 py-2 rounded-xl max-w-[85%] whitespace-pre-wrap text-sm leading-relaxed ${
+              m.role === "user" ? "bg-secondary text-secondary-foreground" : "bg-muted text-foreground"
+            }`}>
+              {m.content || (loading && i === messages.length - 1 ? <Loader2 className="h-4 w-4 animate-spin" /> : "")}
+            </div>
           </div>
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-2">
-            <span className="text-gradient">Nexus</span> AI
-          </h1>
-          <p className="text-muted-foreground">Built into Nexus. Streaming responses, no signup.</p>
-        </div>
-
-        <div className="glass rounded-2xl shadow-purple flex flex-col h-[65vh]">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
-                <div className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${m.role === "user" ? "bg-secondary" : "bg-gradient-primary"}`}>
-                  {m.role === "user" ? <User className="h-4 w-4 text-secondary-foreground" /> : <Bot className="h-4 w-4 text-primary-foreground" />}
-                </div>
-                <div className={`px-4 py-3 rounded-2xl max-w-[80%] whitespace-pre-wrap text-sm leading-relaxed ${
-                  m.role === "user" ? "bg-secondary text-secondary-foreground" : "bg-muted text-foreground"
-                }`}>
-                  {m.content || (loading && i === messages.length - 1 ? <Loader2 className="h-4 w-4 animate-spin" /> : "")}
-                </div>
-              </div>
-            ))}
-          </div>
-          <form
-            onSubmit={(e) => { e.preventDefault(); send(); }}
-            className="border-t border-border p-3 flex gap-2"
-          >
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Nexus AI anything..."
-              disabled={loading}
-              className="flex-1 bg-input rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary text-sm"
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="bg-gradient-primary text-primary-foreground font-semibold px-5 rounded-xl hover:scale-105 transition-smooth disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </button>
-          </form>
-        </div>
+        ))}
       </div>
+      <form
+        onSubmit={(e) => { e.preventDefault(); send(); }}
+        className="border-t border-border p-2 flex gap-2"
+      >
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask Nexus AI..."
+          disabled={loading}
+          className="flex-1 bg-input rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary text-sm"
+        />
+        <button
+          type="submit"
+          disabled={loading || !input.trim()}
+          className="bg-gradient-primary text-primary-foreground font-semibold px-3 rounded-lg hover:scale-105 transition-smooth disabled:opacity-50 disabled:hover:scale-100"
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+        </button>
+      </form>
     </div>
   );
 };
