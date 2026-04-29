@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sparkles, MessageCircle } from "lucide-react";
 import { NexusHeader } from "@/components/NexusHeader";
 import { HomeView } from "@/components/HomeView";
@@ -10,11 +10,26 @@ import { SidePanel } from "@/components/SidePanel";
 import { SettingsView } from "@/components/SettingsView";
 import { DotsBackground } from "@/components/DotsBackground";
 import { SettingsProvider } from "@/contexts/SettingsContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AuthScreen } from "@/components/AuthScreen";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
-const Index = () => {
+const InnerApp = () => {
+  const { user, username, loading, signOut } = useAuth();
   const [tab, setTab] = useState("home");
   const [aiOpen, setAiOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const greetedFor = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (user && username && greetedFor.current !== user.id) {
+      greetedFor.current = user.id;
+      toast.success(`Welcome, ${username}! ✨`, {
+        description: "You're connected to Nexus Proxy.",
+      });
+    }
+  }, [user, username]);
 
   const openAI = () => { setAiOpen(true); setChatOpen(false); };
   const openChat = () => { setChatOpen(true); setAiOpen(false); };
@@ -25,8 +40,25 @@ const Index = () => {
     setTab(id);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center relative">
+        <DotsBackground />
+        <Loader2 className="h-8 w-8 animate-spin text-primary relative z-10" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen relative">
+        <DotsBackground />
+        <AuthScreen />
+      </div>
+    );
+  }
+
   return (
-    <SettingsProvider>
     <div className="min-h-screen flex flex-col relative">
       <DotsBackground />
       <div className="relative z-10 flex flex-col min-h-screen">
@@ -37,6 +69,8 @@ const Index = () => {
         chatOpen={chatOpen}
         onToggleAI={() => { aiOpen ? setAiOpen(false) : openAI(); }}
         onToggleChat={() => { chatOpen ? setChatOpen(false) : openChat(); }}
+        onSignOut={signOut}
+        username={username}
       />
       <main className="flex-1">
         {tab === "home" && <HomeView onNavigate={handleNav} />}
@@ -64,8 +98,15 @@ const Index = () => {
       </SidePanel>
       </div>
     </div>
-    </SettingsProvider>
   );
 };
+
+const Index = () => (
+  <AuthProvider>
+    <SettingsProvider>
+      <InnerApp />
+    </SettingsProvider>
+  </AuthProvider>
+);
 
 export default Index;
