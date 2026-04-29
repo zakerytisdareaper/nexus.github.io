@@ -151,7 +151,7 @@ export const CURSORS: { id: CursorId; name: string; css: string }[] = [
 ];
 
 export const CLOAKS: { id: CloakId; name: string; title: string; favicon: string }[] = [
-  { id: "none", name: "None (Nexus Proxy)", title: "Nexus Proxy — Unblocked Games, AI & Chat", favicon: "/favicon.ico" },
+  { id: "none", name: "None (Nexus Proxy)", title: "NƎXUS · PRØXY", favicon: "/favicon.ico" },
   { id: "google", name: "Google", title: "Google", favicon: "https://www.google.com/favicon.ico" },
   { id: "classroom", name: "Google Classroom", title: "Home", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
   { id: "drive", name: "Google Drive", title: "My Drive - Google Drive", favicon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png" },
