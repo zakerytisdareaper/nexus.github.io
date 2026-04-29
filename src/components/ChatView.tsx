@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageCircle, Send, Users } from "lucide-react";
+import { MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 type Msg = { id: string; username: string; content: string; created_at: string };
@@ -52,77 +52,62 @@ export const ChatView = () => {
 
   if (!username) {
     return (
-      <div className="container py-20 max-w-md mx-auto">
-        <div className="glass rounded-2xl p-8 text-center shadow-blue">
-          <MessageCircle className="h-12 w-12 mx-auto mb-4 text-accent animate-float" />
-          <h2 className="font-display text-2xl font-bold mb-2">Join the Lobby</h2>
-          <p className="text-muted-foreground text-sm mb-6">Pick a handle to chat with everyone on Nexus.</p>
-          <form onSubmit={join} className="space-y-3">
-            <input
-              value={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              maxLength={32}
-              placeholder="Your username"
-              className="w-full bg-input rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary text-center"
-            />
-            <button className="w-full bg-gradient-primary text-primary-foreground font-semibold py-3 rounded-xl shadow-glow hover:scale-[1.02] transition-smooth">
-              Enter Chat
-            </button>
-          </form>
-        </div>
+      <div className="flex flex-col h-full items-center justify-center p-6 text-center">
+        <MessageCircle className="h-10 w-10 mb-3 text-accent animate-float" />
+        <h3 className="font-display font-bold mb-1">Join the lobby</h3>
+        <p className="text-muted-foreground text-xs mb-4">Pick a handle to chat.</p>
+        <form onSubmit={join} className="w-full space-y-2">
+          <input
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            maxLength={32}
+            placeholder="Username"
+            className="w-full bg-input rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary text-sm text-center"
+          />
+          <button className="w-full bg-gradient-primary text-primary-foreground text-sm font-semibold py-2 rounded-lg hover:scale-[1.02] transition-smooth">
+            Enter
+          </button>
+        </form>
       </div>
     );
   }
 
   return (
-    <div className="container py-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="font-display text-4xl md:text-5xl font-bold mb-2">
-            Live <span className="text-gradient">Chat</span>
-          </h1>
-          <p className="text-muted-foreground flex items-center gap-2 justify-center text-sm">
-            <Users className="h-4 w-4" /> Chatting as <span className="text-foreground font-semibold">{username}</span>
-          </p>
-        </div>
-
-        <div className="glass rounded-2xl shadow-blue flex flex-col h-[65vh]">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-3">
-            {messages.length === 0 && (
-              <p className="text-center text-muted-foreground text-sm pt-10">No messages yet — say hi 👋</p>
-            )}
-            {messages.map((m) => {
-              const mine = m.username === username;
-              return (
-                <div key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
-                  <span className="text-[11px] text-muted-foreground mb-1 px-2">{m.username}</span>
-                  <div className={`px-4 py-2.5 rounded-2xl max-w-[75%] text-sm break-words ${
-                    mine ? "bg-gradient-primary text-primary-foreground" : "bg-muted text-foreground"
-                  }`}>
-                    {m.content}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <form onSubmit={(e) => { e.preventDefault(); send(); }} className="border-t border-border p-3 flex gap-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              maxLength={500}
-              placeholder="Type a message..."
-              className="flex-1 bg-input rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary text-sm"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="bg-gradient-primary text-primary-foreground font-semibold px-5 rounded-xl hover:scale-105 transition-smooth disabled:opacity-50"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
+    <div className="flex flex-col h-full">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2">
+        {messages.length === 0 && (
+          <p className="text-center text-muted-foreground text-xs pt-10">No messages yet — say hi 👋</p>
+        )}
+        {messages.map((m) => {
+          const mine = m.username === username;
+          return (
+            <div key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
+              <span className="text-[10px] text-muted-foreground mb-0.5 px-1">{m.username}</span>
+              <div className={`px-3 py-2 rounded-xl max-w-[85%] text-sm break-words ${
+                mine ? "bg-gradient-primary text-primary-foreground" : "bg-muted text-foreground"
+              }`}>
+                {m.content}
+              </div>
+            </div>
+          );
+        })}
       </div>
+      <form onSubmit={(e) => { e.preventDefault(); send(); }} className="border-t border-border p-2 flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          maxLength={500}
+          placeholder={`Message as ${username}`}
+          className="flex-1 bg-input rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary text-sm"
+        />
+        <button
+          type="submit"
+          disabled={!input.trim()}
+          className="bg-gradient-primary text-primary-foreground font-semibold px-3 rounded-lg hover:scale-105 transition-smooth disabled:opacity-50"
+        >
+          <Send className="h-4 w-4" />
+        </button>
+      </form>
     </div>
   );
 };
