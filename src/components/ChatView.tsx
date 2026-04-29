@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Send } from "lucide-react";
+import { Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,7 +12,7 @@ const formatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
 export const ChatView = () => {
-  const { username } = useAuth();
+  const { username, isAdmin } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -36,6 +36,9 @@ export const ChatView = () => {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages" }, (p) => {
         setMessages(prev => [...prev, p.new as Msg]);
       })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "chat_messages" }, (p) => {
+        setMessages(prev => prev.filter(m => m.id !== (p.old as Msg).id));
+      })
       .subscribe();
 
     // Periodically prune messages older than 1 hour from local view
@@ -53,6 +56,12 @@ export const ChatView = () => {
     setInput("");
     const { error } = await supabase.from("chat_messages").insert({ username, content: text.slice(0, 500) });
     if (error) { toast.error("Failed to send"); console.error(error); }
+  };
+
+  const deleteMessage = async (id: string) => {
+    const { error } = await supabase.from("chat_messages").delete().eq("id", id);
+    if (error) toast.error("Delete failed");
+    else setMessages(prev => prev.filter(m => m.id !== id));
   };
 
   if (!username) {
@@ -79,6 +88,11 @@ export const ChatView = () => {
               <span className="text-[10px] text-muted-foreground mb-0.5 px-1 flex items-center gap-1.5">
                 <span>{m.username}</span>
                 <span className="opacity-60">· {formatTime(m.created_at)}</span>
+                {isAdmin && (
+                  <button onClick={() => deleteMessage(m.id)} title="Delete (admin)" className="opacity-60 hover:opacity-100 hover:text-destructive transition-smooth">
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                )}
               </span>
               <div className={`px-3 py-2 rounded-xl max-w-[85%] text-sm break-words ${
                 mine ? "bg-gradient-primary text-primary-foreground" : "bg-muted text-foreground"
