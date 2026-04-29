@@ -1,16 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { NexusHeader } from "@/components/NexusHeader";
+import { HomeView } from "@/components/HomeView";
+import { ProxyView } from "@/components/ProxyView";
+import { GamesView } from "@/components/GamesView";
+import { AIView } from "@/components/AIView";
+import { ChatView } from "@/components/ChatView";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [tab, setTab] = useState("home");
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen">
+      <NexusHeader active={tab} onChange={setTab} />
+      <main>
+        {tab === "home" && <HomeView onNavigate={setTab} />}
+        {tab === "proxy" && <ProxyView />}
+        {tab === "games" && <GamesView />}
+        {tab === "ai" && <AIView />}
+        {tab === "chat" && <ChatView />}
+      </main>
+      <footer className="border-t border-border mt-16 py-6 text-center text-xs text-muted-foreground">
+        Nexus Proxy · Browse free · Stay anonymous
+      </footer>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
