@@ -1,4 +1,6 @@
-import { Globe, Gamepad2, Sparkles, MessageCircle, Shield, Zap } from "lucide-react";
+import { Globe, Gamepad2, Sparkles, MessageCircle, Shield, Zap, Users } from "lucide-react";
+import { usePresence } from "@/hooks/usePresence";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 
 interface Props { onNavigate: (id: string) => void; }
 
@@ -9,9 +11,24 @@ const features = [
   { id: "chat", icon: MessageCircle, title: "Live Chat", desc: "Side panel lobby — talk while you browse or play.", color: "shadow-blue" },
 ];
 
-export const HomeView = ({ onNavigate }: Props) => (
+export const HomeView = ({ onNavigate }: Props) => {
+  const online = usePresence();
+  return (
   <div className="container py-12 md:py-20">
+    <AnnouncementBanner />
     <section className="text-center max-w-4xl mx-auto mb-20">
+      <div className="flex justify-center mb-4">
+        <div className="inline-flex items-center gap-2 glass px-4 py-1.5 rounded-full">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+          </span>
+          <Users className="h-3.5 w-3.5 text-accent" />
+          <span className="text-xs font-semibold">
+            <span className="text-gradient">{online}</span> {online === 1 ? "person" : "people"} online
+          </span>
+        </div>
+      </div>
       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-6 animate-pulse-glow">
         <Shield className="h-3.5 w-3.5 text-accent" />
         <span className="text-xs font-medium uppercase tracking-wider">Anonymous • Encrypted • Free</span>
@@ -63,3 +80,4 @@ export const HomeView = ({ onNavigate }: Props) => (
     </section>
   </div>
 );
+};
